@@ -39,15 +39,19 @@ def to_ncdu:
 	)
 ;
 
+def safe_tonumber:
+	if . == "-" then 0 else tonumber end
+;
+
 [
 	split("\n")[] | select(. != "") | split("\t") |
 	{
 		name: (.[0] | split("/")),
-		usedbydataset: (.[1] | tonumber),
-		usedbyrefreservation: (.[2] | tonumber),
-		usedbysnapshots: (.[3] | tonumber),
-		usedbychildren: (.[4] | tonumber),
-		lrefer: (.[5] | tonumber),
+		usedbydataset: (.[1] | safe_tonumber),
+		usedbyrefreservation: (.[2] | safe_tonumber),
+		usedbysnapshots: (.[3] | safe_tonumber),
+		usedbychildren: (.[4] | safe_tonumber),
+		lrefer: (.[5] | safe_tonumber),
 	}
 ] as $lines |
 [
