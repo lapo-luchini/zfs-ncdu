@@ -1,12 +1,18 @@
 #!/bin/sh
 
-zfs list -Hp -o name,usedbydataset,usedbyrefreservation,usedbysnapshots,usedbychildren,lrefer | jq --raw-input --slurp '
+zfs list -Hp -o name,usedbydataset,usedbyrefreservation,usedbysnapshots,usedbychildren,refer,lrefer | jq --raw-input --slurp '
 def local_entries:
 	[] +
 	if .usedbydataset > 0 then
 		[{
 			name: "files",
 			dsize: .usedbydataset,
+			asize: .lrefer,
+		}]
+	elif .refer > 0 then
+		[{
+			name: "files",
+			dsize: .refer,
 			asize: .lrefer,
 		}]
 	else [] end +
@@ -51,7 +57,8 @@ def safe_tonumber:
 		usedbyrefreservation: (.[2] | safe_tonumber),
 		usedbysnapshots: (.[3] | safe_tonumber),
 		usedbychildren: (.[4] | safe_tonumber),
-		lrefer: (.[5] | safe_tonumber),
+		refer: (.[5] | safe_tonumber),
+		lrefer: (.[6] | safe_tonumber),
 	}
 ] as $lines |
 [
